@@ -1,0 +1,35 @@
+{
+  "name": "leaflet-modal",
+  "main": [
+    "dist/Leaflet.Modal.js",
+    "dist/leaflet.modal.css"
+  ],
+  "version": "0.0.1",
+  "authors": [
+    "w8r <info@w8r.name>"
+  ],
+  "description": "Modal/dialog window inside leaflet map",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "leaflet",
+    "modal",
+    "dialog",
+    "window",
+    "overlay"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/w8r/Leaflet.Modal",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "leaflet": "~0.7.3"
+  }
+}
