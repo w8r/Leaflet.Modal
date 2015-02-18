@@ -4,7 +4,7 @@
     "dist/Leaflet.Modal.js",
     "dist/leaflet.modal.css"
   ],
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": [
     "w8r <info@w8r.name>"
   ],

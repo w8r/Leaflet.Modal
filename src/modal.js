@@ -129,7 +129,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     var mapSize = this._map.getSize();
 
     if (content.offsetHeight < mapSize.y) {
-      content.style.marginTop = (mapSize.y - content.offsetHeight) / 2;
+      content.style.marginTop = ((mapSize.y - content.offsetHeight) / 2) + 'px';
     }
 
     setTimeout(L.Util.bind(function() {
