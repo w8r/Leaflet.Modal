@@ -1,5 +1,7 @@
 # L.Map.Modal
 
+[![npm version](https://badge.fury.io/js/leaflet-modal.svg)](http://badge.fury.io/js/leaflet-modal) [![Bower version](https://badge.fury.io/bo/leaflet-modal.svg)](http://badge.fury.io/bo/leaflet-modal)
+
 ![Screenshot](http://s30.postimg.org/9zgjh019t/L_Modal.jpg)
 
 Modal window inside your [Leaflet](http://leafletjs.com) map.
