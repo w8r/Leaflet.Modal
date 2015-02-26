@@ -1,6 +1,6 @@
 {
   "name": "leaflet-modal",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Modal/dialog window inside leaflet map",
   "main": "index.js",
   "directories": {

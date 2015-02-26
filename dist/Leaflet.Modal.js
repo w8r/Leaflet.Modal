@@ -9,6 +9,15 @@
 "use strict";
 
 /**
+ * "foo bar baz" -> ".foo.bar.baz"
+ * @param  {String} classString
+ * @return {String}
+ */
+L.DomUtil.classNameToSelector = function(classString) {
+  return (' ' + classString).split(' ').join('.').replace(/^\s+|\s+$/g, '');
+};
+
+/**
  * Modal handler
  * @class   {L.Map.Modal}
  * @extends {L.Mixin.Events}
@@ -50,7 +59,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
       '</div></div>'
     ].join(''),
 
-    template: '{content}'
+    template: '{content}',
+    content: ''
 
   },
 
@@ -174,6 +184,13 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
         _content: L.Util.template(options.template, options)
       })
     );
+    if (options.element) {
+      var contentContainer = this._container.querySelector(
+        L.DomUtil.classNameToSelector(this.options.MODAL_CONTENT_CLS));
+      if (contentContainer) {
+        contentContainer.appendChild(options.element);
+      }
+    }
   },
 
   /**
@@ -264,7 +281,7 @@ L.Map.include( /** @lends {L.Map.prototype} */ {
    * @return {L.Map}
    */
   closeModal: function() {
-    this.moadl.hide();
+    this.modal.hide();
     return this;
   }
 

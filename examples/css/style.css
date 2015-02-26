@@ -67,3 +67,14 @@ hr {
   padding-left: 15px;
   padding-right: 15px;
 }
+
+.dom-ex {
+  background: #ddd;
+  display: block;
+  margin: 0 auto;
+  height: 250px;
+  width: 250px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 2em;
+}

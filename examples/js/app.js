@@ -64,4 +64,21 @@ L.DomEvent
           });
       }
     })
+  })
+  .on(document.querySelector('.open-modal-dom'), 'click', function() {
+    var node = L.DomUtil.create('div', 'dom-ex');
+    node.innerHTML = '<h2>Click me</h2><p>To move the map and then close modal</p>';
+    L.DomEvent.on(node, 'click', function() {
+      var size = map.getSize();
+      map.on('moveend', function() {
+        setTimeout(function() {
+          map.closeModal();
+        }, 1000);
+      }).panBy(
+        L.point((2 * Math.random() - 1) * size.x * 0.5, (2 * Math.random() - 1) * size.y * 0.5)
+      );
+    });
+    map.fire('modal', {
+      element: node
+    });
   });
