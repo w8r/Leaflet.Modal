@@ -33,6 +33,7 @@ map.fire('modal', {
   OVERLAY_CLS: 'overlay',              // overlay(backdrop) CSS class
   MODAL_CLS: 'modal',                  // all modal blocks wrapper CSS class
   MODAL_CONTENT_CLS: 'modal-content',  // modal window CSS class
+  INNER_CONTENT_CLS: 'modal-inner',    // inner content wrapper
   SHOW_CLS: 'show',                    // `modal open` CSS class, here go your transitions
   CLOSE_CLS: 'close'                   // `x` button CSS class
 });
@@ -50,9 +51,9 @@ map.closeModal();
 The handler fires following events on the map instance:
 
 `'modal.show', L.Map.Modal.SHOW => { modal: modal }`
-Selection changed or finished.
-
 `'modal.hide', L.Map.Modal.HIDE => { modal: modal }`
+`'modal.showStart, L.Map.Modal.SHOW_START => { modal: modal }`
+`'modal.changed, L.Map.Modal.CHANGED => { modal: modal }`
 
 ## Usage
 

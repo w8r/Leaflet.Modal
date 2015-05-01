@@ -78,3 +78,7 @@ hr {
   vertical-align: middle;
   font-size: 2em;
 }
+
+.centered {
+  text-align: center;
+}

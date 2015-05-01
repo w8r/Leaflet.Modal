@@ -34,7 +34,9 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   statics: {
     BASE_CLS: 'leaflet-modal',
     HIDE: 'modal.hide',
-    SHOW: 'modal.show'
+    SHOW_START: 'modal.showStart',
+    SHOW: 'modal.show',
+    CHANGED: 'modal.changed'
   },
 
   /**
@@ -44,6 +46,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     OVERLAY_CLS: 'overlay',
     MODAL_CLS: 'modal',
     MODAL_CONTENT_CLS: 'modal-content',
+    INNER_CONTENT_CLS: 'modal-inner',
     SHOW_CLS: 'show',
     CLOSE_CLS: 'close',
 
@@ -55,7 +58,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
       '<div class="{OVERLAY_CLS}"></div>',
       '<div class="{MODAL_CLS}"><div class="{MODAL_CONTENT_CLS}">',
       '<span class="{CLOSE_CLS}" title="{closeTitle}">&times;</span>',
-      '{_content}',
+      '<div class="{INNER_CONTENT_CLS}">{_content}</div>',
       '</div></div>'
     ].join(''),
 
@@ -84,6 +87,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     L.DomEvent
       .disableClickPropagation(container)
       .disableScrollPropagation(container);
+    L.DomEvent.on(container, 'contextmenu', L.DomEvent.stopPropagation);
 
     this.enable();
   },
@@ -124,6 +128,40 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   },
 
   /**
+   * Show again, or just resize and re-position
+   * @param  {Object=} options
+   */
+  update: function(options) {
+    if (options) {
+      this._show(options);
+    } else {
+      this._updatePosition();
+    }
+  },
+
+  /**
+   * @param {String} content
+   */
+  setContent: function(content) {
+    this._getInnerContentContainer().innerHTML = content;
+    this.update();
+  },
+
+  /**
+   * Update container position
+   */
+  _updatePosition: function() {
+    var content = this._getContentContainer();
+    var mapSize = this._map.getSize();
+
+    if (content.offsetHeight < mapSize.y) {
+      content.style.marginTop = ((mapSize.y - content.offsetHeight) / 2) + 'px';
+    } else {
+      content.style.marginTop = '';
+    }
+  },
+
+  /**
    * @param  {Object} options
    */
   _show: function(options) {
@@ -135,16 +173,17 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     this._render(options);
     this._setContainerSize(options);
 
-    var content = this._getConentContainer();
-    var mapSize = this._map.getSize();
+    this._updatePosition();
 
-    if (content.offsetHeight < mapSize.y) {
-      content.style.marginTop = ((mapSize.y - content.offsetHeight) / 2) + 'px';
-    }
-
-    setTimeout(L.Util.bind(function() {
+    L.Util.requestAnimFrame(function() {
+      var contentContainer = this._getContentContainer();
+      L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
       L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
-    }, this), 0);
+
+      if (!L.Browser.any3d) {
+        L.Util.requestAnimFrame(this._onTransitionEnd, this);
+      }
+    }, this);
 
     var closeBtn = this._container.querySelector('.' + this.options.CLOSE_CLS);
     if (closeBtn) {
@@ -156,8 +195,6 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
       L.DomEvent.on(modal, 'mousedown', this._onMouseDown, this);
     }
 
-    this._visible = true;
-
     // callbacks
     if (typeof options.onShow === 'function') {
       this._map.once(L.Map.Modal.SHOW, options.onShow);
@@ -168,9 +205,25 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     }
 
     // fire event
-    this._map.fire(L.Map.Modal.SHOW, {
+    this._map.fire(L.Map.Modal.SHOW_START, {
       modal: this
     });
+  },
+
+  /**
+   * Show transition ended
+   * @param  {TransitionEvent=} e
+   */
+  _onTransitionEnd: function(e) {
+    var data = {
+      modal: this
+    };
+    if (!this._visible) {
+      this._visible = true;
+      this._map.fire(L.Map.Modal.SHOW, data);
+    } else {
+      this._map.fire(L.Map.Modal.CHANGED, data);
+    }
   },
 
   /**
@@ -204,8 +257,18 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   /**
    * @return {Element}
    */
-  _getConentContainer: function() {
-    return this._container.querySelector('.' + this.options.MODAL_CONTENT_CLS);
+  _getContentContainer: function() {
+    return this._container.querySelector(
+      L.DomUtil.classNameToSelector(this.options.MODAL_CONTENT_CLS));
+  },
+
+  /**
+   * Inner content, don't touch destroy button
+   * @return {Element}
+   */
+  _getInnerContentContainer: function() {
+    return this._container.querySelector(
+      L.DomUtil.classNameToSelector(this.options.INNER_CONTENT_CLS))
   },
 
   /**
@@ -214,7 +277,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @param {Number} options.height
    */
   _setContainerSize: function(options) {
-    var content = this._getConentContainer();
+    var content = this._getContentContainer();
 
     if (options.width) {
       content.style.width = options.width + 'px';
