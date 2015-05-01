@@ -119,6 +119,10 @@ L.DomEvent
             '<p><button class="topcoat-button--large btn-stop">Stop</button></p>' +
             (new Array(lines)).join('<p>Content line</p>'));
         }, 1000);
+      },
+
+      onHide: function() {
+        clearInterval(timer);
       }
     });
   });
