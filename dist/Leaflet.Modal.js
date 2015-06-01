@@ -218,11 +218,16 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     var data = {
       modal: this
     };
+    var map = this._map;
     if (!this._visible) {
-      this._visible = true;
-      this._map.fire(L.Map.Modal.SHOW, data);
+      if (L.DomUtil.hasClass(this._container, this.options.SHOW_CLS)) {
+        this._visible = true;
+        map.fire(L.Map.Modal.SHOW, data);
+      } else {
+        map.fire(L.Map.Modal.HIDE, data);
+      }
     } else {
-      this._map.fire(L.Map.Modal.CHANGED, data);
+      map.fire(L.Map.Modal.CHANGED, data);
     }
   },
 
@@ -303,11 +308,9 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     if (this._visible) {
       this._hideInternal();
 
-      setTimeout(L.Util.bind(function() {
-        this._map.fire(L.Map.Modal.HIDE, {
-          modal: this
-        });
-      }, this), this.options.transitionDuration);
+      if (!L.Browser.any3d) {
+        L.Util.requestAnimFrame(this._onTransitionEnd, this);
+      }
     }
   },
 
