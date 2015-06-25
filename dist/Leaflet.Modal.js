@@ -178,6 +178,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     L.Util.requestAnimFrame(function() {
       var contentContainer = this._getContentContainer();
       L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
+      L.DomEvent.disableClickPropagation(contentContainer);
       L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
 
       if (!L.Browser.any3d) {
