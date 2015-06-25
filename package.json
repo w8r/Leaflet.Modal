@@ -1,6 +1,6 @@
 {
   "name": "leaflet-modal",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Modal/dialog window inside leaflet map",
   "main": "index.js",
   "directories": {
@@ -11,7 +11,11 @@
     "url": "https://github.com/w8r/Leaflet.Modal.git"
   },
   "keywords": [
-    "leaflet", "modal", "dialog", "window", "overlay"
+    "leaflet",
+    "modal",
+    "dialog",
+    "window",
+    "overlay"
   ],
   "dependencies": {
     "leaflet": "^0.7.3"
