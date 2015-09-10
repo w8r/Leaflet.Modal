@@ -24,19 +24,19 @@ L.DomEvent
         '<p class="centered"><img src="img/doge.jpg" alt="eurodoge has landed"></p>' +
         '<div class="centered">Image by ' +
         '<a href="https://twitter.com/hasdogelanded">@hasdogelanded</a></div>'
-    })
+    });
   })
   .on(document.querySelector('.open-modal-long'), 'click', function() {
     map.fire('modal', {
       content: '<h1>Modal header</h1>' + (new Array(100)).join('<p>Content line</p>')
-    })
+    });
   })
   .on(document.querySelector('.open-modal-size'), 'click', function() {
     map.fire('modal', {
       content: '<h1>Modal header</h1>' + (new Array(2)).join('<p>Content line</p>'),
       width: 300,
       height: 350
-    })
+    });
   })
   .on(document.querySelector('.open-modal-custom'), 'click', function() {
     map.fire('modal', {

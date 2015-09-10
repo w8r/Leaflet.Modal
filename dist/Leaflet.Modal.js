@@ -309,9 +309,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     if (this._visible) {
       this._hideInternal();
 
-      if (!L.Browser.any3d) {
-        L.Util.requestAnimFrame(this._onTransitionEnd, this);
-      }
+      L.Util.requestAnimFrame(this._onTransitionEnd, this);
     }
   },
 
