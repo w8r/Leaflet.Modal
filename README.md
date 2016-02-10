@@ -51,8 +51,11 @@ map.closeModal();
 The handler fires following events on the map instance:
 
 `'modal.show', L.Map.Modal.SHOW => { modal: modal }`
+
 `'modal.hide', L.Map.Modal.HIDE => { modal: modal }`
+
 `'modal.showStart, L.Map.Modal.SHOW_START => { modal: modal }`
+
 `'modal.changed, L.Map.Modal.CHANGED => { modal: modal }`
 
 ## Usage
