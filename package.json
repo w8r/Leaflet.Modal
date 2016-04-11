@@ -18,7 +18,7 @@
     "overlay"
   ],
   "dependencies": {
-    "leaflet": "^0.7.3"
+    "leaflet": "^1.0.0-beta.2"
   },
   "devDependencies": {
     "catw": "^0.2.0",
