@@ -1,5 +1,6 @@
-var L = global.L || require('leaflet');
-var Modal = require('../../index');
+/* global L */
+
+var Modal = require('../../src/modal');
 
 L.Icon.Default.imagePath = "http://cdn.leafletjs.com/leaflet-0.7/images";
 

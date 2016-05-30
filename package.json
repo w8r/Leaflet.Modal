@@ -2,7 +2,7 @@
   "name": "leaflet-modal",
   "version": "1.0.0-beta.1",
   "description": "Modal/dialog window inside leaflet map",
-  "main": "index.js",
+  "main": "src/modal.js",
   "directories": {
     "example": "examples"
   },
@@ -17,13 +17,13 @@
     "window",
     "overlay"
   ],
-  "dependencies": {
-    "leaflet": "^1.0.0-beta.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "catw": "^0.2.0",
-    "serve": "^1.4.0",
+    "leaflet": "^1.0.0-beta.2",
     "less": "^2.1.2",
+    "serve": "^1.4.0",
+    "uglifyjs": "^2.4.10",
     "watchify": "^2.2.1"
   },
   "scripts": {
@@ -31,7 +31,7 @@
     "start": "npm run watch & serve -p 3001",
     "watch": "npm run watch-js & npm run watch-css",
     "watch-css": "catw -c 'lessc -' 'src/*.less' -o dist/leaflet.modal.css -v",
-    "watch-js": "watchify -v -d examples/js/app.js -o examples/js/bundle.js",
+    "watch-js": "watchify -v -d examples/js/app.js -u leaflet -o examples/js/bundle.js",
     "build-less": "lessc src/leaflet.modal.less > dist/leaflet.modal.css",
     "compress-less": "lessc -x src/leaflet.modal.less > dist/leaflet.modal.min.css",
     "build-css": "npm run build-less && npm run compress-less",

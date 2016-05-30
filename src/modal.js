@@ -6,7 +6,7 @@
  * @preserve
  */
 
-"use strict";
+/* global L */
 
 /**
  * "foo bar baz" -> ".foo.bar.baz"
@@ -360,3 +360,10 @@ L.Map.include( /** @lends {L.Map.prototype} */ {
   }
 
 });
+
+
+if (typeof module === 'object' && typeof module.exports === 'object') {
+  module.exports = L.Map.Modal;
+} else if (typeof define === 'function' && define.amd) {
+  define(L.Map.Modal);
+}
