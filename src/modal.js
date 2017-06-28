@@ -9,15 +9,6 @@
 "use strict";
 
 /**
- * "foo bar baz" -> ".foo.bar.baz"
- * @param  {String} classString
- * @return {String}
- */
-L.DomUtil.classNameToSelector = function(classString) {
-  return (' ' + classString).split(' ').join('.').replace(/^\s+|\s+$/g, '');
-};
-
-/**
  * Modal handler
  * @class   {L.Map.Modal}
  * @extends {L.Mixin.Events}
@@ -36,7 +27,15 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     HIDE: 'modal.hide',
     SHOW_START: 'modal.showStart',
     SHOW: 'modal.show',
-    CHANGED: 'modal.changed'
+    CHANGED: 'modal.changed',
+    /**
+     * "foo bar baz" -> ".foo.bar.baz"
+     * @param  {String} classString
+     * @return {String}
+     */
+    classNameToSelector: function(classString) {
+      return (' ' + classString).split(' ').join('.').replace(/^\s+|\s+$/g, '');
+    }
   },
 
   /**
@@ -253,7 +252,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     );
     if (options.element) {
       var contentContainer = this._container.querySelector(
-        L.DomUtil.classNameToSelector(this.options.MODAL_CONTENT_CLS));
+        L.Map.Modal.classNameToSelector(this.options.MODAL_CONTENT_CLS));
       if (contentContainer) {
         contentContainer.appendChild(options.element);
       }
@@ -265,7 +264,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    */
   _getContentContainer: function() {
     return this._container.querySelector(
-      L.DomUtil.classNameToSelector(this.options.MODAL_CONTENT_CLS));
+      L.Map.Modal.classNameToSelector(this.options.MODAL_CONTENT_CLS));
   },
 
   /**
@@ -274,7 +273,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    */
   _getInnerContentContainer: function() {
     return this._container.querySelector(
-      L.DomUtil.classNameToSelector(this.options.INNER_CONTENT_CLS))
+      L.Map.Modal.classNameToSelector(this.options.INNER_CONTENT_CLS))
   },
 
   /**
