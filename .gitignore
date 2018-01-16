@@ -8,6 +8,7 @@ buildlogs/*
 node_modules/*
 bower_components/*
 docs/*
+package-lock.json
 
 build.properties
 
