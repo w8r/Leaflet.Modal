@@ -16,7 +16,7 @@
  */
 L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
-  includes: L.Mixin.Events,
+  includes: L.Evented ? L.Evented.prototype : L.Mixin.Events,
 
   /**
    * @static
