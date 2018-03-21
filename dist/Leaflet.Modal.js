@@ -190,7 +190,9 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
     var closeBtn = this._container.querySelector('.' + this.options.CLOSE_CLS);
     if (closeBtn) {
-      L.DomEvent.on(closeBtn, 'click', this._onCloseClick, this);
+      L.DomEvent.on(closeBtn, 'click', function (evt) {
+        this._onCloseClick(evt, options);
+      }, this);
     }
 
     var modal = this._container.querySelector('.' + this.options.MODAL_CLS);
@@ -236,10 +238,11 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
   /**
    * @param  {L.MouseEvent} evt
+   * @param  {Object} options
    */
-  _onCloseClick: function(evt) {
+  _onCloseClick: function(evt, options) {
     L.DomEvent.stop(evt);
-    this._hide();
+    this._hide(options);
   },
 
   /**
