@@ -174,6 +174,15 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
     this._updatePosition();
 
+    // callbacks before firing
+    if (typeof options.onShow === 'function') {
+      this._map.once(L.Map.Modal.SHOW, options.onShow);
+    }
+
+    if (typeof options.onHide === 'function') {
+      this._map.once(L.Map.Modal.HIDE, options.onHide);
+    }
+
     this.requestAnimFrame(function() {
       var contentContainer = this._getContentContainer();
       L.DomEvent.disableClickPropagation(contentContainer);
@@ -198,15 +207,6 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     var modal = this._container.querySelector('.' + this.options.MODAL_CLS);
     if (modal) {
       L.DomEvent.on(modal, 'mousedown', this._onMouseDown, this);
-    }
-
-    // callbacks
-    if (typeof options.onShow === 'function') {
-      this._map.once(L.Map.Modal.SHOW, options.onShow);
-    }
-
-    if (typeof options.onHide === 'function') {
-      this._map.once(L.Map.Modal.HIDE, options.onHide);
     }
 
     // fire event
@@ -362,7 +362,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   },
 
   requestAnimFrame: function (cb, options, context) {
-    if (options.transitionDuration) {
+    if (options && options.transitionDuration) {
       return L.Util.requestAnimFrame(cb, context);
     }
     return cb.call(context);
@@ -395,7 +395,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
         el.style[property] = val;
       }
     }
-}
+  }
 
 });
 
