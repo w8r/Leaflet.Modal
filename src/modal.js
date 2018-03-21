@@ -174,14 +174,17 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
     this._updatePosition();
 
-    L.Util.requestAnimFrame(function() {
+    this.requestAnimFrame(function() {
       var contentContainer = this._getContentContainer();
-      L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
       L.DomEvent.disableClickPropagation(contentContainer);
       L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
-
+      if (this.options.transitionDuration) {
+        L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
+      } else {
+        this._onTransitionEnd();
+      }
       if (!L.Browser.any3d) {
-        L.Util.requestAnimFrame(this._onTransitionEnd, this);
+        this.requestAnimFrame(this._onTransitionEnd, this);
       }
     }, this);
 
@@ -257,14 +260,35 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
         contentContainer.appendChild(options.element);
       }
     }
+    if (this.options.transitionDuration) {
+      var containers = [
+        [this._getContentContainer(), "margin "],
+        [this._getContainerByClassName(this.options.OVERLAY_CLS), "opacity"]
+      ];
+      for (var fry = 0; fry < containers.length; fry++) {
+        var container = containers[fry][0];
+        var transitionProperty = containers[fry][1];
+        if (container) {
+          var transition = transitionProperty + " " + this.options.transitionDuration + "ms linear";
+          this.setCss3Style(container, "transition", transition);
+        }
+      }
+    }
+  },
+
+  /**
+   * @return {Element}
+   */
+  _getContainerByClassName: function (className) {
+    return this._container.querySelector(
+      L.Map.Modal.classNameToSelector(className));
   },
 
   /**
    * @return {Element}
    */
   _getContentContainer: function() {
-    return this._container.querySelector(
-      L.Map.Modal.classNameToSelector(this.options.MODAL_CONTENT_CLS));
+    return this._getContainerByClassName(this.options.MODAL_CONTENT_CLS);
   },
 
   /**
@@ -272,8 +296,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @return {Element}
    */
   _getInnerContentContainer: function() {
-    return this._container.querySelector(
-      L.Map.Modal.classNameToSelector(this.options.INNER_CONTENT_CLS))
+    return this._getContainerByClassName(this.options.INNER_CONTENT_CLS)
   },
 
   /**
@@ -308,13 +331,13 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     if (this._visible) {
       this._hideInternal();
 
-      L.Util.requestAnimFrame(this._onTransitionEnd, this);
+      this.requestAnimFrame(this._onTransitionEnd, this);
     }
   },
 
   /**
    * Mouse down on overlay
-   * @param  {L.MouseEvent} evt
+   * @param {L.MouseEvent} evt
    */
   _onMouseDown: function(evt) {
     L.DomEvent.stop(evt);
@@ -326,14 +349,50 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
   /**
    * Key stroke(escape)
-   * @param  {KeyboardEvent} evt
+   * @param {KeyboardEvent} evt
    */
   _onKeyDown: function(evt) {
     var key = evt.keyCode || evt.which;
     if (key === 27) {
       this._hide();
     }
-  }
+  },
+
+  requestAnimFrame: function (cb, context) {
+    if (this.options.transitionDuration) {
+      return L.Util.requestAnimFrame(cb, context);
+    }
+    return cb.call(context);
+  },
+
+  /**
+   * Set element style property with vendors prefix
+   * @param {Element} el
+   * @param {string} prop
+   * @param {string} val
+   */
+  setCss3Style: function(el, prop, val) {
+    var vendors = [
+      '-webkit-',
+      '-o-',
+      '-moz-',
+      '-ms-',
+      ''
+    ];
+    var toCamelCase = function(str) {
+      return str.toLowerCase().replace(/(\-[a-z])/g, function($1) {
+        return $1.toUpperCase().replace('-', '');
+      });
+    };
+
+    for (var fry = 0; fry < vendors.length; fry++) {
+      var vendor = vendors[fry];
+      var property = toCamelCase(vendor + prop);
+      if (property in el.style) {
+        el.style[property] = val;
+      }
+    }
+}
 
 });
 
