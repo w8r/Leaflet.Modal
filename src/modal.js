@@ -114,8 +114,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   /**
    * @return {L.Map.Modal}
    */
-  hide: function() {
-    this._hide();
+  hide: function(options) {
+    this._hide(options);
     return this;
   },
 
@@ -178,15 +178,15 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
       var contentContainer = this._getContentContainer();
       L.DomEvent.disableClickPropagation(contentContainer);
       L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
-      if (this.options.transitionDuration) {
+      if (options.transitionDuration) {
         L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
       } else {
         this._onTransitionEnd();
       }
       if (!L.Browser.any3d) {
-        this.requestAnimFrame(this._onTransitionEnd, this);
+        this.requestAnimFrame(this._onTransitionEnd, options, this);
       }
-    }, this);
+    }, options, this);
 
     var closeBtn = this._container.querySelector('.' + this.options.CLOSE_CLS);
     if (closeBtn) {
@@ -269,7 +269,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
         var container = containers[fry][0];
         var transitionProperty = containers[fry][1];
         if (container) {
-          var transition = transitionProperty + " " + this.options.transitionDuration + "ms linear";
+          var transition = transitionProperty + " " + options.transitionDuration + "ms linear";
           this.setCss3Style(container, "transition", transition);
         }
       }
@@ -327,11 +327,11 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   /**
    * Hide modal
    */
-  _hide: function() {
+  _hide: function(options) {
     if (this._visible) {
       this._hideInternal();
 
-      this.requestAnimFrame(this._onTransitionEnd, this);
+      this.requestAnimFrame(this._onTransitionEnd, options, this);
     }
   },
 
@@ -358,8 +358,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     }
   },
 
-  requestAnimFrame: function (cb, context) {
-    if (this.options.transitionDuration) {
+  requestAnimFrame: function (cb, options, context) {
+    if (options.transitionDuration) {
       return L.Util.requestAnimFrame(cb, context);
     }
     return cb.call(context);
@@ -412,8 +412,8 @@ L.Map.include( /** @lends {L.Map.prototype} */ {
   /**
    * @return {L.Map}
    */
-  closeModal: function() {
-    this.modal.hide();
+  closeModal: function(options) {
+    this.modal.hide(options);
     return this;
   }
 
