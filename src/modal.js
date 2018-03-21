@@ -260,7 +260,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
         contentContainer.appendChild(options.element);
       }
     }
-    if (this.options.transitionDuration) {
+    if (options.transitionDuration) {
       var containers = [
         [this._getContentContainer(), "margin "],
         [this._getContainerByClassName(this.options.OVERLAY_CLS), "opacity"]
