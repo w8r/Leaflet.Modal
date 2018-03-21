@@ -13,9 +13,6 @@
   opacity: 0;
   filter: alpha(opacity=0);
   z-index: 10001;
-  -webkit-transition: opacity 0.25s linear;
-  -o-transition: opacity 0.25s linear;
-  transition: opacity 0.25s linear;
 }
 .leaflet-modal .close {
   -webkit-appearance: none;
@@ -66,9 +63,6 @@
   margin-top: 100%;
   margin-bottom: 40px;
   max-width: 600px;
-  -webkit-transition: margin 0.3s linear;
-  -o-transition: margin 0.3s linear;
-  transition: margin 0.3s linear;
 }
 .leaflet-modal.show {
   width: 100%;
