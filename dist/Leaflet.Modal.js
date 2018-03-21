@@ -114,8 +114,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   /**
    * @return {L.Map.Modal}
    */
-  hide: function() {
-    this._hide();
+  hide: function(options) {
+    this._hide(options);
     return this;
   },
 
@@ -174,34 +174,39 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
     this._updatePosition();
 
-    L.Util.requestAnimFrame(function() {
-      var contentContainer = this._getContentContainer();
-      L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
-      L.DomEvent.disableClickPropagation(contentContainer);
-      L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
-
-      if (!L.Browser.any3d) {
-        L.Util.requestAnimFrame(this._onTransitionEnd, this);
-      }
-    }, this);
-
-    var closeBtn = this._container.querySelector('.' + this.options.CLOSE_CLS);
-    if (closeBtn) {
-      L.DomEvent.on(closeBtn, 'click', this._onCloseClick, this);
-    }
-
-    var modal = this._container.querySelector('.' + this.options.MODAL_CLS);
-    if (modal) {
-      L.DomEvent.on(modal, 'mousedown', this._onMouseDown, this);
-    }
-
-    // callbacks
+    // callbacks before firing
     if (typeof options.onShow === 'function') {
       this._map.once(L.Map.Modal.SHOW, options.onShow);
     }
 
     if (typeof options.onHide === 'function') {
       this._map.once(L.Map.Modal.HIDE, options.onHide);
+    }
+
+    this.requestAnimFrame(function() {
+      var contentContainer = this._getContentContainer();
+      L.DomEvent.disableClickPropagation(contentContainer);
+      L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
+      if (options.transitionDuration) {
+        L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
+      } else {
+        this._onTransitionEnd();
+      }
+      if (!L.Browser.any3d) {
+        this.requestAnimFrame(this._onTransitionEnd, options, this);
+      }
+    }, options, this);
+
+    var closeBtn = this._container.querySelector('.' + this.options.CLOSE_CLS);
+    if (closeBtn) {
+      L.DomEvent.on(closeBtn, 'click', function (evt) {
+        this._onCloseClick(evt, options);
+      }, this);
+    }
+
+    var modal = this._container.querySelector('.' + this.options.MODAL_CLS);
+    if (modal) {
+      L.DomEvent.on(modal, 'mousedown', this._onMouseDown, this);
     }
 
     // fire event
@@ -233,10 +238,11 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
   /**
    * @param  {L.MouseEvent} evt
+   * @param  {Object} options
    */
-  _onCloseClick: function(evt) {
+  _onCloseClick: function(evt, options) {
     L.DomEvent.stop(evt);
-    this._hide();
+    this._hide(options);
   },
 
   /**
@@ -257,14 +263,35 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
         contentContainer.appendChild(options.element);
       }
     }
+    if (options.transitionDuration) {
+      var containers = [
+        [this._getContentContainer(), "margin "],
+        [this._getContainerByClassName(this.options.OVERLAY_CLS), "opacity"]
+      ];
+      for (var fry = 0; fry < containers.length; fry++) {
+        var container = containers[fry][0];
+        var transitionProperty = containers[fry][1];
+        if (container) {
+          var transition = transitionProperty + " " + options.transitionDuration + "ms linear";
+          this.setCss3Style(container, "transition", transition);
+        }
+      }
+    }
+  },
+
+  /**
+   * @return {Element}
+   */
+  _getContainerByClassName: function (className) {
+    return this._container.querySelector(
+      L.Map.Modal.classNameToSelector(className));
   },
 
   /**
    * @return {Element}
    */
   _getContentContainer: function() {
-    return this._container.querySelector(
-      L.Map.Modal.classNameToSelector(this.options.MODAL_CONTENT_CLS));
+    return this._getContainerByClassName(this.options.MODAL_CONTENT_CLS);
   },
 
   /**
@@ -272,8 +299,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @return {Element}
    */
   _getInnerContentContainer: function() {
-    return this._container.querySelector(
-      L.Map.Modal.classNameToSelector(this.options.INNER_CONTENT_CLS))
+    return this._getContainerByClassName(this.options.INNER_CONTENT_CLS)
   },
 
   /**
@@ -304,17 +330,17 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   /**
    * Hide modal
    */
-  _hide: function() {
+  _hide: function(options) {
     if (this._visible) {
       this._hideInternal();
 
-      L.Util.requestAnimFrame(this._onTransitionEnd, this);
+      this.requestAnimFrame(this._onTransitionEnd, options, this);
     }
   },
 
   /**
    * Mouse down on overlay
-   * @param  {L.MouseEvent} evt
+   * @param {L.MouseEvent} evt
    */
   _onMouseDown: function(evt) {
     L.DomEvent.stop(evt);
@@ -326,12 +352,48 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
   /**
    * Key stroke(escape)
-   * @param  {KeyboardEvent} evt
+   * @param {KeyboardEvent} evt
    */
   _onKeyDown: function(evt) {
     var key = evt.keyCode || evt.which;
     if (key === 27) {
       this._hide();
+    }
+  },
+
+  requestAnimFrame: function (cb, options, context) {
+    if (options && options.transitionDuration) {
+      return L.Util.requestAnimFrame(cb, context);
+    }
+    return cb.call(context);
+  },
+
+  /**
+   * Set element style property with vendors prefix
+   * @param {Element} el
+   * @param {string} prop
+   * @param {string} val
+   */
+  setCss3Style: function(el, prop, val) {
+    var vendors = [
+      '-webkit-',
+      '-o-',
+      '-moz-',
+      '-ms-',
+      ''
+    ];
+    var toCamelCase = function(str) {
+      return str.toLowerCase().replace(/(\-[a-z])/g, function($1) {
+        return $1.toUpperCase().replace('-', '');
+      });
+    };
+
+    for (var fry = 0; fry < vendors.length; fry++) {
+      var vendor = vendors[fry];
+      var property = toCamelCase(vendor + prop);
+      if (property in el.style) {
+        el.style[property] = val;
+      }
     }
   }
 
@@ -353,8 +415,8 @@ L.Map.include( /** @lends {L.Map.prototype} */ {
   /**
    * @return {L.Map}
    */
-  closeModal: function() {
-    this.modal.hide();
+  closeModal: function(options) {
+    this.modal.hide(options);
     return this;
   }
 
