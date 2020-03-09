@@ -1,14 +1,12 @@
-var L = global.L || require('leaflet');
-var Modal = require('../../index');
-
-L.Icon.Default.imagePath = "http://cdn.leafletjs.com/leaflet-0.7/images";
+import L from 'leaflet';
+import Modal from '../../index';
 
 // preload eurodoge
 var img = new Image();
 img.src = 'img/doge.jpg';
 
 ////////////////////////////////////////////////////////////////////////////////
-var map = global.map = new L.Map('map', {}).setView([22.42658, 114.1452], 11);
+var map = window.map = new L.Map('map', {}).setView([22.42658, 114.1452], 11);
 
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
   attribution: '&copy; ' +

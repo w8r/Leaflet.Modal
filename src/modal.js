@@ -1,12 +1,4 @@
-/**
- * Leaflet modal control
- *
- * @license MIT
- * @author Alexander Milevski <info@w8r.name>
- * @preserve
- */
-
-"use strict";
+import L from 'leaflet';
 
 /**
  * Modal handler
@@ -33,7 +25,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
      * @param  {String} classString
      * @return {String}
      */
-    classNameToSelector: function(classString) {
+    classNameToSelector: (classString) => {
       return (' ' + classString).split(' ').join('.').replace(/^\s+|\s+$/g, '');
     }
   },
@@ -77,7 +69,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
     this._visible = false;
 
-    var container = this._container =
+    const container = this._container =
       L.DomUtil.create('div', L.Map.Modal.BASE_CLS, map._container);
     container.style.zIndex = this.options.zIndex;
     container.style.position = 'absolute';
@@ -96,9 +88,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    */
   addHooks: function() {
     L.DomEvent.on(document, 'keydown', this._onKeyDown, this);
-    this._map.on({
-      modal: this._show
-    }, this);
+    this._map.on({ modal: this._show }, this);
   },
 
   /**
@@ -106,9 +96,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    */
   removeHooks: function() {
     L.DomEvent.off(document, 'keydown', this._onKeyDown, this);
-    this._map.off({
-      modal: this._show
-    }, this);
+    this._map.off({ modal: this._show }, this);
   },
 
   /**
@@ -131,11 +119,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @param  {Object=} options
    */
   update: function(options) {
-    if (options) {
-      this._show(options);
-    } else {
-      this._updatePosition();
-    }
+    if (options) this._show(options);
+    else         this._updatePosition();
   },
 
   /**
@@ -150,11 +135,12 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * Update container position
    */
   _updatePosition: function() {
-    var content = this._getContentContainer();
-    var mapSize = this._map.getSize();
+    const content = this._getContentContainer();
+    const { y } = this._map.getSize();
+    const { offsetHeight } = content;
 
-    if (content.offsetHeight < mapSize.y) {
-      content.style.marginTop = ((mapSize.y - content.offsetHeight) / 2) + 'px';
+    if (offsetHeight < y) {
+      content.style.marginTop = ((y - offsetHeight) / 2) + 'px';
     } else {
       content.style.marginTop = '';
     }
@@ -164,9 +150,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @param  {Object} options
    */
   _show: function(options) {
-    if (this._visible) {
-      this._hide();
-    }
+    if (this._visible) this._hide();
     options = L.Util.extend({}, this.options, options);
 
     this._render(options);
@@ -174,8 +158,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
 
     this._updatePosition();
 
-    L.Util.requestAnimFrame(function() {
-      var contentContainer = this._getContentContainer();
+    L.Util.requestAnimFrame(() => {
+      const contentContainer = this._getContentContainer();
       L.DomEvent.on(contentContainer, 'transitionend', this._onTransitionEnd, this);
       L.DomEvent.disableClickPropagation(contentContainer);
       L.DomUtil.addClass(this._container, this.options.SHOW_CLS);
@@ -183,14 +167,16 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
       if (!L.Browser.any3d) {
         L.Util.requestAnimFrame(this._onTransitionEnd, this);
       }
-    }, this);
+    });
 
-    var closeBtn = this._container.querySelector('.' + this.options.CLOSE_CLS);
+    const container = this._container;
+
+    const closeBtn = container.querySelector('.' + this.options.CLOSE_CLS);
     if (closeBtn) {
       L.DomEvent.on(closeBtn, 'click', this._onCloseClick, this);
     }
 
-    var modal = this._container.querySelector('.' + this.options.MODAL_CLS);
+    const modal = container.querySelector('.' + this.options.MODAL_CLS);
     if (modal) {
       L.DomEvent.on(modal, 'mousedown', this._onMouseDown, this);
     }
@@ -205,9 +191,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
     }
 
     // fire event
-    this._map.fire(L.Map.Modal.SHOW_START, {
-      modal: this
-    });
+    this._map.fire(L.Map.Modal.SHOW_START, { modal: this });
   },
 
   /**
@@ -215,10 +199,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @param  {TransitionEvent=} e
    */
   _onTransitionEnd: function(e) {
-    var data = {
-      modal: this
-    };
-    var map = this._map;
+    const data = { modal: this };
+    const map = this._map;
     if (!this._visible) {
       if (L.DomUtil.hasClass(this._container, this.options.SHOW_CLS)) {
         this._visible = true;
@@ -251,7 +233,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
       })
     );
     if (options.element) {
-      var contentContainer = this._container.querySelector(
+      const contentContainer = this._container.querySelector(
         L.Map.Modal.classNameToSelector(this.options.MODAL_CONTENT_CLS));
       if (contentContainer) {
         contentContainer.appendChild(options.element);
@@ -282,7 +264,7 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @param {Number} options.height
    */
   _setContainerSize: function(options) {
-    var content = this._getContentContainer();
+    const content = this._getContentContainer();
 
     if (options.width) {
       content.style.width = options.width + 'px';
@@ -307,7 +289,6 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
   _hide: function() {
     if (this._visible) {
       this._hideInternal();
-
       L.Util.requestAnimFrame(this._onTransitionEnd, this);
     }
   },
@@ -318,10 +299,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    */
   _onMouseDown: function(evt) {
     L.DomEvent.stop(evt);
-    var target = (evt.target || evt.srcElement);
-    if (L.DomUtil.hasClass(target, this.options.MODAL_CLS)) {
-      this._hide();
-    }
+    const target = (evt.target || evt.srcElement);
+    if (L.DomUtil.hasClass(target, this.options.MODAL_CLS)) this._hide();
   },
 
   /**
@@ -329,10 +308,8 @@ L.Map.Modal = L.Handler.extend( /** @lends {L.Map.Hadler.prototype} */ {
    * @param  {KeyboardEvent} evt
    */
   _onKeyDown: function(evt) {
-    var key = evt.keyCode || evt.which;
-    if (key === 27) {
-      this._hide();
-    }
+    const key = evt.keyCode || evt.which;
+    if (key === 27) this._hide();
   }
 
 });
@@ -357,5 +334,6 @@ L.Map.include( /** @lends {L.Map.prototype} */ {
     this.modal.hide();
     return this;
   }
-
 });
+
+export default L.Map.Modal;

@@ -1,8 +1,8 @@
 {
   "name": "leaflet-modal",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Modal/dialog window inside leaflet map",
-  "main": "index.js",
+  "main": "dist/L.Modal.js",
   "directories": {
     "example": "examples"
   },
@@ -18,27 +18,28 @@
     "overlay"
   ],
   "dependencies": {
-    "leaflet": "^0.7.3"
+    "leaflet": "^1.6.0"
   },
   "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.1",
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
     "catw": "^0.2.0",
-    "serve": "^1.4.0",
-    "shx": "^0.2.2",
-    "less": "^2.1.2",
-    "watchify": "^2.2.1"
+    "lessc": "^1.0.2",
+    "rollup": "^2.0.2",
+    "rollup-plugin-terser": "^5.3.0",
+    "serve": "^11.3.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run watch & serve -p 3001",
     "watch": "npm run watch-js & npm run watch-css",
     "watch-css": "catw -c 'lessc -' 'src/*.less' -o dist/leaflet.modal.css -v",
-    "watch-js": "watchify -v -d examples/js/app.js -o examples/js/bundle.js",
+    "watch-js": "rollup -cw",
     "build-less": "lessc src/leaflet.modal.less > dist/leaflet.modal.css",
     "compress-less": "lessc -x src/leaflet.modal.less > dist/leaflet.modal.min.css",
     "build-css": "npm run build-less && npm run compress-less",
-    "build-js": "shx cp src/modal.js ./dist/Leaflet.Modal.js",
-    "compress": "uglifyjs ./dist/Leaflet.Modal.js -m -c drop_console=true,warnings=false > dist/Leaflet.Modal.min.js",
-    "build": "npm run build-js && npm run compress && npm run build-css"
+    "build-js": "rollup -c",
+    "build": "npm run build-js && npm run build-css"
   },
   "author": "Alexander Milevski <info@w8r.name>",
   "license": "MIT"
